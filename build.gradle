@@ -1,0 +1,15 @@
+apply plugin: 'java'
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+
+repositories {
+    jcenter()
+}
+checkstyle {
+    toolVersion = "6.19"
+    ignoreFailures = false
+}
+
+Closure compilerOptions = {
+    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+}
