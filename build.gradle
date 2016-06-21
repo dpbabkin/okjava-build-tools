@@ -2,10 +2,9 @@ apply plugin: 'java'
 apply plugin: 'checkstyle'
 apply plugin: 'findbugs'
 
+println 'project.name: ' + project.name
 
-println project.name
-
-println project(':build-tool').projectDir// + 'checkstyle/checkstyle.xml'
+println project(':build-tool').projectDir.absolutePath + '/config/checkstyle/checkstyle.xml'
 
 repositories {
     jcenter()
