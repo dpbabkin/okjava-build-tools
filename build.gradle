@@ -4,7 +4,7 @@ apply plugin: 'findbugs'
 
 println 'project.name: ' + project.name
 
-println project(':build-tool').projectDir.absolutePath + '/config/checkstyle/checkstyle.xml'
+//println project(':build-tool').projectDir.absolutePath + '/config/checkstyle/checkstyle.xml'
 
 repositories {
     jcenter()
@@ -49,4 +49,22 @@ tasks.withType(FindBugs) {
         xml.enabled false
         html.enabled true
     }
+}
+
+
+allprojects {
+    task hello1 << { task -> println "I'm allprojects $task.project.name" }
+
+    println project.name + ' allprojects'
+
+    apply plugin: 'checkstyle'
+    apply plugin: 'findbugs'
+
+}
+
+subprojects {
+
+    println project.name + ' subprojects'
+
+    task hello2 << { task -> println "I'm subprojects $task.project.name" }
 }
