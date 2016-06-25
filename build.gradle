@@ -53,7 +53,7 @@ tasks.withType(FindBugs) {
 
 
 allprojects {
-    task hello1 << { task -> println "I'm allprojects $task.project.name" }
+    //task hello1 << { task -> println "I'm allprojects $task.project.name" }
 
     println project.name + ' allprojects'
 
