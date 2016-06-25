@@ -1,47 +1,38 @@
+println 'rootProject.name: ' + rootProject.name + ' project.name: ' + project.name
+
 apply plugin: 'java'
 apply plugin: 'checkstyle'
 apply plugin: 'findbugs'
 
-println 'project.name: ' + project.name
-
-//println project(':build-tool').projectDir.absolutePath + '/config/checkstyle/checkstyle.xml'
-
 repositories {
     jcenter()
 }
-
 
 task jarTest(type: Jar) {
     from sourceSets.test.output
     classifier = 'test'
 }
 
-
 configurations {
     testLib
 }
-
 
 artifacts {
     testLib jarTest
 }
 
-
 Closure compilerOptions = {
     options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
 }
 
-
 compileJava compilerOptions
 compileTestJava compilerOptions
-
 
 checkstyle {
     toolVersion = "6.19"
     ignoreFailures = false
-    configFile = new File( (project(':build-tool').projectDir as String  )+ '/config/checkstyle/checkstyle.xml' )
+    configFile = new File((project(':build-tool').projectDir as String) + '/config/checkstyle/checkstyle.xml')
 }
-
 
 tasks.withType(FindBugs) {
     reports {
@@ -50,29 +41,17 @@ tasks.withType(FindBugs) {
     }
 }
 
-
-allprojects {
-    //task hello1 << { task -> println "I'm allprojects $task.project.name" }
-
-    println project.name + ' allprojects'
-
-   // apply plugin: 'checkstyle'
-   // apply plugin: 'findbugs'
-
-}
-
-subprojects {
-
-    println project.name + ' subprojects'
-
-    task hello2 << { task -> println "I'm subprojects $task.project.name" }
-}
-
-
 dependencies {
 
     compile group: 'org.slf4j', name: 'slf4j-api', version: '+'
+    compile group: 'com.google.guava', name: 'guava', version: '+'
 
     testCompile group: 'junit', name: 'junit', version: '+'
     testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
+}
+
+allprojects {
+}
+
+subprojects {
 }
