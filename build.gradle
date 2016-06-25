@@ -39,8 +39,7 @@ compileTestJava compilerOptions
 checkstyle {
     toolVersion = "6.19"
     ignoreFailures = false
-    //configFile = project(':build-tool').checkstyle.configFile //+ 'checkstyle/checkstyle.xml'
-    configFile = '../build-tool/config/checkstyle/checkstyle.xml' as File
+    configFile = new File( (project(':build-tool').projectDir as String  )+ '/config/checkstyle/checkstyle.xml' )
 }
 
 
@@ -57,8 +56,8 @@ allprojects {
 
     println project.name + ' allprojects'
 
-    apply plugin: 'checkstyle'
-    apply plugin: 'findbugs'
+   // apply plugin: 'checkstyle'
+   // apply plugin: 'findbugs'
 
 }
 
@@ -67,4 +66,13 @@ subprojects {
     println project.name + ' subprojects'
 
     task hello2 << { task -> println "I'm subprojects $task.project.name" }
+}
+
+
+dependencies {
+
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '+'
+
+    testCompile group: 'junit', name: 'junit', version: '+'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
 }
