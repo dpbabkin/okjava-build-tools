@@ -28,11 +28,18 @@ Closure compilerOptions = {
 compileJava compilerOptions
 compileTestJava compilerOptions
 
+def getCheckStyleConfig() {
+    def p =project;
+    if (project.name != 'build-tool') {
+        p = project(':build-tool')
+    }
+   return new File((p.projectDir as String) + '/config/checkstyle/checkstyle.xml')
+}
+
 checkstyle {
     toolVersion = "6.19"
     ignoreFailures = false
-    //configFile = new File((project(':build-tool').projectDir as String) + '/config/checkstyle/checkstyle.xml')
-    configFile = new File('/config/checkstyle/checkstyle.xml')
+    configFile = getCheckStyleConfig()
 }
 
 tasks.withType(FindBugs) {
