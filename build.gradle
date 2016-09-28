@@ -29,10 +29,10 @@ compileJava compilerOptions
 compileTestJava compilerOptions
 
 def getCheckStyleConfig() {
-    def p =project;
-    if (project.name != 'build-tool') {
-        p = project(':build-tool')
-    }
+    //def p =project;
+    //if (project.name != 'build-tool') {
+    //    p = project(':build-tool')
+    //}
    return new File((p.projectDir as String) + '/config/checkstyle/checkstyle.xml')
 }
 
