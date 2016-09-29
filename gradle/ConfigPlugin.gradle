@@ -11,5 +11,14 @@ class ConfigPlugin implements Plugin<Project> {
         project.repositories({
             jcenter()
         })
+
+        project.dependencies {
+
+            compile group: 'org.slf4j', name: 'slf4j-api', version: '+'
+            compile group: 'com.google.guava', name: 'guava', version: '+'
+
+            testCompile group: 'junit', name: 'junit', version: '+'
+            testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
+        }
     }
 }
