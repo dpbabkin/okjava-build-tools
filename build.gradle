@@ -1,8 +1,17 @@
 println 'rootProject.name: ' + rootProject.name + ' project.name: ' + project.name
 
+defaultTasks 'build'
+
 apply plugin: 'java'
 apply plugin: 'checkstyle'
 apply plugin: 'findbugs'
+
+jar {
+    from('.') {
+        include 'gradle/'
+        include 'config/'
+    }
+}
 
 repositories {
     jcenter()
@@ -33,7 +42,7 @@ def getCheckStyleConfig() {
     //if (project.name != 'build-tool') {
     //    p = project(':build-tool')
     //}
-   return new File((project.projectDir as String) + '/config/checkstyle/checkstyle.xml')
+    return new File((project.projectDir as String) + '/config/checkstyle/checkstyle.xml')
 }
 
 checkstyle {

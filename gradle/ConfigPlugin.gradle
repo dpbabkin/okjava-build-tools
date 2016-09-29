@@ -4,8 +4,13 @@ class ConfigPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.apply(plugin: 'java')
 
+        project.apply(from: 'test.gradle')
+        project.apply(from: project.buildscript.classLoader.getResource('path/to/your/resource/in/the/jar').toURI())
+
+
+
         project.task('hello') << {
-            println project.greeting.message
+            println 'hello ))) '
         }
 
         project.repositories({
