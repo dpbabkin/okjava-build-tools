@@ -4,7 +4,6 @@ class ConfigPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.apply(plugin: 'java')
 
-        // Add a task that uses the configuration
         project.task('hello') << {
             println project.greeting.message
         }
