@@ -7,5 +7,9 @@ class ConfigPlugin implements Plugin<Project> {
         project.task('hello') << {
             println project.greeting.message
         }
+
+        project.repositories({
+            jcenter()
+        })
     }
 }
