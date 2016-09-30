@@ -4,10 +4,8 @@ class ConfigPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.apply(plugin: 'java')
 
-        project.apply(from: 'test.gradle')
-        project.apply(from: project.buildscript.classLoader.getResource('path/to/your/resource/in/the/jar').toURI())
-
-
+        //project.apply(from: 'test.gradle')
+        //project.apply(from: project.buildscript.classLoader.getResource('path/to/your/resource/in/the/jar').toURI())
 
         project.task('hello') << {
             println 'hello ))) '
@@ -18,7 +16,6 @@ class ConfigPlugin implements Plugin<Project> {
         })
 
         project.dependencies {
-
             compile group: 'org.slf4j', name: 'slf4j-api', version: '+'
             compile group: 'com.google.guava', name: 'guava', version: '+'
 
