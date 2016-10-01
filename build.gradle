@@ -1,74 +1,28 @@
-println 'rootProject.name: ' + rootProject.name + ' project.name: ' + project.name
+println 'rootProject.name: ' + rootProject.name
+println 'project.name: ' + project.name
 
 defaultTasks 'build'
+apply plugin: 'groovy'
 
-apply plugin: 'java'
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
-
-jar {
-    from('.') {
-        include 'gradle/'
-        include 'config/'
-    }
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
 }
 
 repositories {
     jcenter()
 }
 
-task jarTest(type: Jar) {
-    from sourceSets.test.output
-    classifier = 'test'
-}
-
-configurations {
-    testLib
-}
-
-artifacts {
-    testLib jarTest
-}
-
-Closure compilerOptions = {
-    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
-}
-
-compileJava compilerOptions
-compileTestJava compilerOptions
-
-def getCheckStyleConfig() {
-    //def p =project;
-    //if (project.name != 'build-tool') {
-    //    p = project(':build-tool')
-    //}
-    return new File((project.projectDir as String) + '/config/checkstyle/checkstyle.xml')
-}
-
-checkstyle {
-    toolVersion = "6.19"
-    ignoreFailures = false
-    configFile = getCheckStyleConfig()
-}
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
-}
-
 dependencies {
-
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '+'
-    compile group: 'com.google.guava', name: 'guava', version: '+'
-
     testCompile group: 'junit', name: 'junit', version: '+'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
 }
 
-allprojects {
-}
+group = 'okjava'
+//version = '1.0-SNAPSHOT'
 
-subprojects {
+jar {
+    from('.') {
+        include 'gradle/'
+        include 'config/'
+    }
 }

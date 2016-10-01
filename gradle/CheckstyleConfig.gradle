@@ -1,0 +1,12 @@
+apply plugin: 'checkstyle'
+
+def getCheckStyleConfig() {
+    def url = project.buildscript.classLoader.getResource('config/checkstyle/checkstyle.xml').toURI();
+    return new File(url)
+}
+
+checkstyle {
+    toolVersion = "6.19"
+    ignoreFailures = false
+    configFile = getCheckStyleConfig()
+}
