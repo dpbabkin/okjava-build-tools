@@ -4,6 +4,8 @@ println 'project.name: ' + project.name
 defaultTasks 'build'
 apply plugin: 'groovy'
 
+apply plugin: 'maven'
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
@@ -17,12 +19,20 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '+'
 }
 
-group = 'okjava'
-version = '1.0-SNAPSHOT'
+group = 'com.okjava'
+version = '1.0'
 
 jar {
     from('.') {
         include 'gradle/'
         include 'config/'
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
     }
 }

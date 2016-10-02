@@ -1,0 +1,6 @@
+project.ext.definedGretting='okjava build config plugin loaded'
+println project.ext.definedGretting
+
+project.ext.load('JavaConfig')
+//apply from: 'JavaConfig.gradle'
+

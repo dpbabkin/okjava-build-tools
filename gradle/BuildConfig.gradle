@@ -1,2 +1,0 @@
-project.ext.definedGretting='okjava build config loaded'
-apply from: 'JavaConfig.gradle'
