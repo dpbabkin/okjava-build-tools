@@ -5,7 +5,7 @@ import org.gradle.api.Project
 
 class BuildConfigPlugin implements Plugin<Project> {
 
-    String[] configs = { 'CommonConfig' };
+    String[] configs = ['CommonConfig'];
 
     void apply(Project project) {
         project.ext.definedGretting = 'okjava build config plugin loaded';
@@ -17,7 +17,7 @@ class BuildConfigPlugin implements Plugin<Project> {
     private static void load(String gradleConfigName, Project project) {
         URL url = project.buildscript.classLoader.getResource('gradle/' + gradleConfigName + '.gradle');
         if (url == null) {
-            println('BuildConfigPlugin:Can not resolve gradle config with name: ' + gradleConfigName);
+            println('BuildConfigPlugin: Can not resolve gradle config with name: ' + gradleConfigName);
             return;
         }
         String urlToGradleConfigFile = url.toURI();
