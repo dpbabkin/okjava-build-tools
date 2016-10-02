@@ -5,7 +5,6 @@ class ConfigPlugin implements Plugin<Project> {
         project.apply(plugin: 'java')
 
         //project.apply(from: 'test.gradle')
-        //project.apply(from: project.buildscript.classLoader.getResource('path/to/your/resource/in/the/jar').toURI())
 
         project.task('hello') << {
             println 'hello ))) '
