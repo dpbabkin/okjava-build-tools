@@ -12,12 +12,12 @@ class BuildConfigPlugin implements Plugin<Project> {
 
     private static void load(String gradleConfigName, Project project) {
         URL url = project.buildscript.classLoader.getResource('gradle/' + gradleConfigName + '.gradle');
-        if (url != null) {
-            String urlToGradleConfigFile = url.toURI();
-            println 'BuildConfigPlugin.loading `' + gradleConfigName + ' from file: ' + urlToGradleConfigFile;
-            project.apply(from: urlToGradleConfigFile);
-        } else {
-            println('url is null. sorry about that.');
+        if (url == null) {
+            println('Can not resolve gradle config with name: ' + gradleConfigName);
+            return;
         }
+        String urlToGradleConfigFile = url.toURI();
+        println 'BuildConfigPlugin.loading `' + gradleConfigName + ' from file: ' + urlToGradleConfigFile;
+        project.apply(from: urlToGradleConfigFile);
     }
 }
