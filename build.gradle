@@ -1,6 +1,8 @@
 println 'rootProject.name: ' + rootProject.name
 println 'project.name: ' + project.name
 
+apply plugin: 'java-gradle-plugin'
+
 defaultTasks 'build'
 apply plugin: 'groovy'
 
@@ -28,6 +30,9 @@ jar {
         include 'config/'
     }
 }
+
+group = 'okjava'
+version = '1.0'
 
 uploadArchives {
     repositories {

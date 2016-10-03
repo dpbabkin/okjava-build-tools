@@ -1,1 +1,6 @@
-project.ext.load('JavaConfig')
+//println project.ext.BuildConfigPluginGretting
+
+okjava('JavaConfig')
+
+
+
