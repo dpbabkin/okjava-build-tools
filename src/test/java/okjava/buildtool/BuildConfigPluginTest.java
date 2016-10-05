@@ -1,40 +1,44 @@
 package okjava.buildtool;
 
+import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertNotNull;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.gradle.api.Project;
-import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.initialization.dsl.ScriptHandler;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
-import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.testfixtures.ProjectBuilder;
+import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
-import org.mockito.internal.matchers.Equals;
-import org.mockito.internal.matchers.InstanceOf;
-import org.mockito.internal.matchers.VarargMatcher;
+import org.mockito.ArgumentCaptor;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Map;
+
+//import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 
 //import static org.hamcrest.core.IsInstanceOf.any;
 
@@ -61,17 +65,18 @@ public class BuildConfigPluginTest {
 
     private final ClassLoader classLoader = mock(ClassLoader.class);
 
-    private final URL url = createURL();
+    private final URL url1 = createURL("file1");
+    private final URL url2 = createURL("file2");
 
-    private final ExtensionContainer extensionContainerCC = mock(ExtensionContainer.class);
-    private final ExtraPropertiesExtension extraPropertiesExtensionCC = mock(ExtraPropertiesExtension.class);
+    private final ExtensionContainer extensionContainerMethodClosure = mock(ExtensionContainer.class);
+    private final ExtraPropertiesExtension extraPropertiesExtensionMethodClosure = mock(ExtraPropertiesExtension.class);
 
-    private final MethodClosure methodClosure = mock(MethodClosure.class);
-    private final MyMethodClosure myMethodClosure = mock(MyMethodClosure.class);
 
-    private static URL createURL() {
+    private final ExtensionAwareMethodClosureImpl extensionAwareMethodClosureImpl = mock(ExtensionAwareMethodClosureImpl.class);
+
+    private static URL createURL(String file) {
         try {
-            return new URL("https://github.com");
+            return new URL("https://github.com/" + file);
         } catch (MalformedURLException e) {
             throw new Error("something went terribly wrong");
         }
@@ -86,40 +91,18 @@ public class BuildConfigPluginTest {
 
         when(project.getBuildscript()).thenReturn(scriptHandler);
         when(scriptHandler.getClassLoader()).thenReturn(classLoader);
-        when(classLoader.getResource(eq("gradle/" + DEFAULT_CONFIGS[0] + ".gradle"))).thenReturn(url);
+        when(classLoader.getResource(eq("gradle/" + DEFAULT_CONFIGS[0] + ".gradle"))).thenReturn(url1);
 
-        //when(extensionContainer.create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(new Object[]{}.getClass()))).thenReturn(methodClosure);
+        when(extensionContainer.create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME))).thenReturn(extensionAwareMethodClosureImpl);
 
-        when(extensionContainer.create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME))).thenReturn(myMethodClosure);
-        //when(extensionContainer.create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class))).thenReturn(methodClosure);
-
-
-        when(myMethodClosure.getExtensions()).thenReturn(extensionContainerCC);
-        when(extensionContainerCC.getExtraProperties()).thenReturn(extraPropertiesExtensionCC);
-
-
-        ArgumentMatcher<Object[]> argumentMatcher = new ArgumentMatcher<Object[]>() {
-
-            @Override
-            public boolean matches(Object[] o) {
-                return o.length == 2 && o[0] instanceof HasLoad && o[1].equals(HasLoad.FUNCTION_NAME);
-            }
-        };
-
-        MM<Object> mm = new MM<>(new InstanceOf(HasLoad.class), new Equals(HasLoad.FUNCTION_NAME));
-
-//        when(extensionContainer.create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class),
-//            argThat(mm)))
-//            .thenReturn(methodClosure);
-        //argThat
-
-        //doReturn(methodClosure).when(extensionContainer).create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME));
+        when(extensionAwareMethodClosureImpl.getExtensions()).thenReturn(extensionContainerMethodClosure);
+        when(extensionContainerMethodClosure.getExtraProperties()).thenReturn(extraPropertiesExtensionMethodClosure);
     }
 
 
-    private static class MyMethodClosure extends MethodClosure implements ExtensionAware {
+    private static class ExtensionAwareMethodClosureImpl extends MethodClosure implements ExtensionAware {
 
-        public MyMethodClosure(Object owner, String method) {
+        public ExtensionAwareMethodClosureImpl(Object owner, String method) {
             super(owner, method);
         }
 
@@ -129,74 +112,118 @@ public class BuildConfigPluginTest {
         }
     }
 
-    private static class MM<T> implements ArgumentMatcher<T[]>, VarargMatcher {
-
-        private final List<ArgumentMatcher<T>> argumentMatchers;
-
-        public MM(ArgumentMatcher<T>... argumentMatchers) {
-            this.argumentMatchers = new ArrayList<>(Arrays.asList(argumentMatchers));
-        }
-
-        @Override
-        public boolean matches(T[] o) {
-            if (o.length != argumentMatchers.size()) {
-                return false;
-            }
-            return IntStream.range(0, o.length).mapToObj(i -> argumentMatchers.get(i).matches(o[i])).allMatch(b -> b);
-        }
-    }
 
     @Test
     public void testProjectCreatedProject() {
 
-
         buildConfigPlugin.apply(project);
 
-        //ArgumentCaptor<Map<String, ?>> argument = ArgumentCaptor.forClass(Map.class);
-        verify(project).apply(eq(singletonMap("from", url)));
-        //assertThat(singletonMap("from", url), is(argument.getValue()));
-
-       // assertThat(argument.getValue(),hasEntry("from", url));
+        verify(project).apply(singletonMap("from", url1));
+        verify(extraPropertiesExtension).has(OKJAVA_EXT_NAME);
+        verify(project, times(3)).getExtensions();
+        verify(extensionContainer).create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME));
+        verify(extensionContainer, times(2)).getExtraProperties();
+        verify(extraPropertiesExtension).set(OKJAVA_EXT_NAME, extensionAwareMethodClosureImpl);
+        verify(extensionAwareMethodClosureImpl).getExtensions();
+        verify(extensionContainerMethodClosure).getExtraProperties();
+        verify(extraPropertiesExtensionMethodClosure).set(eq(CONFIG_EXT_NAME), eq(copyOf(DEFAULT_CONFIGS)));
     }
 
     @Test
-    @Ignore
-    public void testProjectCreatedProject_OLD() {
+    public void testProjectCreatedProjectWithZeroInitialModules() {
 
-        Project project = ProjectBuilder.builder().build();
-        //project.getBuildscript().getDependencies().add("classpath",new File("d:\\Java\\cs\\build-tool\\build\\classes\\test\\"));
-        assertThat(project, notNullValue());
-        assertNotNull(project);
-        //project.getBuildscript().getDependencies().
+        when(extraPropertiesExtension.has(eq(OKJAVA_EXT_NAME))).thenReturn(true);
 
-        project.getPluginManager().apply(JavaPlugin.class);
+        when(extraPropertiesExtension.get(OKJAVA_EXT_NAME)).thenReturn(emptyList());
 
-        File file = new File("test.gradle");
-        assertThat(file.exists(), is(true));
+        buildConfigPlugin.apply(project);
 
-
-        ConfigurableFileCollection collection = project.files("tt");
-        project.apply(singletonMap("from", file.toURI()));
-
-
-        project.getBuildscript().getDependencies().add("classpath", collection);
-        //project.getBuildscript().getClassLoader().
-
-        //project.getBuildscript().getDependencies().add("sas","dsd");
-        //project.getBuildscript().getDependencies().add("classpath","com.google.guava:guava:+");
-
-        project.getPluginManager().apply(BuildConfigPlugin.class);
-        System.out.println("All OK");
-        //assertEquals(project.ext.definedGretting, 'okjava build config loaded')
+        verify(project, never()).apply(anyMap());
+        List<String> loadedConfigs = captureLoadedConfigs();
+        assertThat(loadedConfigs, empty());
     }
 
-//    @Test
-//    public void testProjectCreatedProject2() {
-//        Project project = ProjectBuilder.builder().build();
-//
-//        assertNotNull(project);
-//        project.getPluginManager().apply(BuildConfigPlugin.class);
-//        System.out.println("All OK");
-//        //assertEquals(project.ext.definedGretting, 'okjava build config loaded')
-//    }
+    @Test
+    public void testProjectCreatedProjectWIthThreeInitialModules() {
+
+        List<String> modules = ImmutableList.of("moduleA", "moduleB", "moduleC");
+
+        when(extraPropertiesExtension.has(eq(OKJAVA_EXT_NAME))).thenReturn(true);
+        when(extraPropertiesExtension.get(OKJAVA_EXT_NAME)).thenReturn(modules);
+
+        modules.forEach(moduleName -> when(classLoader.getResource(eq("gradle/" + moduleName + ".gradle"))).thenReturn(createURL(moduleName)));
+
+        buildConfigPlugin.apply(project);
+
+        List<Matcher<? super Map<? extends String, ?>>> matchers = modules
+                                                                       .stream()
+                                                                       .<Matcher<Map<? extends String, ?>>>map(m -> hasEntry(equalTo("from"), equalTo(createURL(m))))
+                                                                       .collect(toList());
+
+        List<Map<String, ?>> mapList = captureMap();
+        assertThat(mapList, containsInAnyOrder(matchers));
+
+        modules.stream().map(BuildConfigPluginTest::createURL).forEach(url -> verify(project).apply(singletonMap("from", url)));
+
+        List<String> loadedConfigs = captureLoadedConfigs();
+        assertThat(loadedConfigs, is(modules));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testThrowsExceptionIfWrongTypeOfInitialConfiguration() {
+
+        when(extraPropertiesExtension.has(eq(OKJAVA_EXT_NAME))).thenReturn(true);
+        when(extraPropertiesExtension.get(OKJAVA_EXT_NAME)).thenReturn(new Object());
+
+        buildConfigPlugin.apply(project);
+
+    }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void testThrowsExceptionWhenWrongTypeOfMethodClosureCreated() {
+
+        when(extensionContainer.create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME)))
+            .thenReturn(new MethodClosure(new Object(), ""));
+
+        buildConfigPlugin.apply(project);
+
+    }
+
+
+    @Test
+    public void testProjectCreatedProjectAndLoadModuleAfter() {
+        String moduleName = "moduleA";
+
+        when(classLoader.getResource(eq("gradle/" + moduleName + ".gradle"))).thenReturn(url2);
+
+        buildConfigPlugin.apply(project);
+
+        List<String> loadedConfigs = captureLoadedConfigs();
+        HasLoad      hasLoad       = captureHasLoad();
+
+        assertThat(loadedConfigs, is(copyOf(DEFAULT_CONFIGS)));
+
+        hasLoad.load(moduleName);
+        assertThat(loadedConfigs, is(ImmutableList.of(DEFAULT_CONFIGS[0], moduleName)));
+    }
+
+    private HasLoad captureHasLoad() {
+        ArgumentCaptor<HasLoad> hasLoadCaptor = ArgumentCaptor.forClass(HasLoad.class);
+        verify(extensionContainer).create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), hasLoadCaptor.capture());
+        return hasLoadCaptor.getAllValues().get(0);
+    }
+
+    private List<String> captureLoadedConfigs() {
+        ArgumentCaptor<List<String>> loadedListCaptor = ArgumentCaptor.forClass(List.class);
+        verify(extraPropertiesExtensionMethodClosure).set(eq(CONFIG_EXT_NAME), loadedListCaptor.capture());
+        return loadedListCaptor.getValue();
+    }
+
+
+    private List<Map<String, ?>> captureMap() {
+        ArgumentCaptor<Map<String, ?>> mapCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(project, atLeastOnce()).apply(mapCaptor.capture());
+        return mapCaptor.getAllValues();
+    }
 }
