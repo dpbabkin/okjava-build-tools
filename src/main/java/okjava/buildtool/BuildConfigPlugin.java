@@ -22,7 +22,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class BuildConfigPlugin implements Plugin<Project> {
 
-    public static final String PLUGIN_ID = "okjava.buildconfig";
     private static final String[] DEFAULT_CONFIGS = {"CommonConfig"};
     private static final String OKJAVA_EXT_NAME = "okjava";
     private static final String CONFIG_EXT_NAME = "configs";

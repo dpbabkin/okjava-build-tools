@@ -214,13 +214,14 @@ public class BuildConfigPluginTest {
         return hasLoadCaptor.getAllValues().get(0);
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> captureLoadedConfigs() {
         ArgumentCaptor<List<String>> loadedListCaptor = ArgumentCaptor.forClass(List.class);
         verify(extraPropertiesExtensionMethodClosure).set(eq(CONFIG_EXT_NAME), loadedListCaptor.capture());
         return loadedListCaptor.getValue();
     }
 
-
+    @SuppressWarnings("unchecked")
     private List<Map<String, ?>> captureMap() {
         ArgumentCaptor<Map<String, ?>> mapCaptor = ArgumentCaptor.forClass(Map.class);
         verify(project, atLeastOnce()).apply(mapCaptor.capture());

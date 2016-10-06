@@ -30,5 +30,5 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '+'
 
     testCompile group: 'junit', name: 'junit', version: '+'
-    //testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
 }
