@@ -1,15 +1,38 @@
+println 'rootProject.name: ' + rootProject.name
+println 'project.name: ' + project.name
 apply plugin: 'java'
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
+apply plugin: 'java-gradle-plugin'
+
+defaultTasks 'build'
+
+apply plugin: 'maven'
 
 repositories {
     jcenter()
 }
-checkstyle {
-    toolVersion = "6.19"
-    ignoreFailures = false
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '+'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '+'
+    testCompile group: 'com.google.guava', name: 'guava', version: '+'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
+    //testRuntime files(sourceSets.test.output.classesDir)
 }
 
-Closure compilerOptions = {
-    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+jar {
+    from('.') {
+        include 'gradle/'
+        include 'checkstyle/'
+    }
+}
+
+group = 'okjava'
+version = '1.0'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
 }
