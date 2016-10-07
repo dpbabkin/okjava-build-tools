@@ -81,7 +81,7 @@ public class BuildConfigPluginTest {
         try {
             return new URL("https://github.com/" + file);
         } catch (MalformedURLException e) {
-            throw new Error("something went terribly wrong");
+            throw new RuntimeException("fail to create URL: 'https://github.com/" + file + "'", e);
         }
     }
 
@@ -129,7 +129,7 @@ public class BuildConfigPluginTest {
         verify(extensionContainer).create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME));
         verify(extensionContainer, times(2)).getExtraProperties();
         verify(extraPropertiesExtension).set(OKJAVA_EXT_NAME, extensionAwareMethodClosureImpl);
-        verify(extensionAwareMethodClosureImpl,times(2)).getExtensions();
+        verify(extensionAwareMethodClosureImpl, times(2)).getExtensions();
         verify(extensionContainerMethodClosure).getExtraProperties();
         verify(extraPropertiesExtensionMethodClosure).set(eq(CONFIG_EXT_NAME), eq(copyOf(DEFAULT_CONFIGS)));
     }
@@ -240,7 +240,7 @@ public class BuildConfigPluginTest {
 
         OutputEventRenderer renderer = new OutputEventRenderer(Actions.doNothing());
         renderer.addStandardOutputListener(System.out);
-        renderer.addStandardErrorListener( System.err);
+        renderer.addStandardErrorListener(System.err);
         renderer.configure(LogLevel.DEBUG);
         outputEventListenerBackedLoggerContext.setOutputEventListener(renderer);
         return new OutputEventListenerBackedLogger(BuildConfigPluginTest.class.getSimpleName(), outputEventListenerBackedLoggerContext, new TrueTimeProvider());
