@@ -25,9 +25,16 @@ import com.google.common.collect.ImmutableList;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.gradle.api.Project;
 import org.gradle.api.initialization.dsl.ScriptHandler;
+import org.gradle.api.logging.LogLevel;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
+import org.gradle.internal.Actions;
+import org.gradle.internal.TrueTimeProvider;
+import org.gradle.logging.internal.OutputEventRenderer;
+import org.gradle.logging.internal.slf4j.OutputEventListenerBackedLogger;
+import org.gradle.logging.internal.slf4j.OutputEventListenerBackedLoggerContext;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,10 +44,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-
-//import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-
-//import static org.hamcrest.core.IsInstanceOf.any;
 
 /**
  * @author Dmitry Babkin dpbabkin@gmail.com
@@ -85,6 +88,8 @@ public class BuildConfigPluginTest {
     @Before
     public void before() {
         when(project.getExtensions()).thenReturn(extensionContainer);
+        when(project.getLogger()).thenReturn(createSystemLogger());
+        createSystemLogger().info("test");
 
         when(extensionContainer.getExtraProperties()).thenReturn(extraPropertiesExtension);
         when(extraPropertiesExtension.has(eq(OKJAVA_EXT_NAME))).thenReturn(false);
@@ -124,7 +129,7 @@ public class BuildConfigPluginTest {
         verify(extensionContainer).create(eq(OKJAVA_EXT_NAME), eq(MethodClosure.class), any(HasLoad.class), eq(HasLoad.FUNCTION_NAME));
         verify(extensionContainer, times(2)).getExtraProperties();
         verify(extraPropertiesExtension).set(OKJAVA_EXT_NAME, extensionAwareMethodClosureImpl);
-        verify(extensionAwareMethodClosureImpl).getExtensions();
+        verify(extensionAwareMethodClosureImpl,times(2)).getExtensions();
         verify(extensionContainerMethodClosure).getExtraProperties();
         verify(extraPropertiesExtensionMethodClosure).set(eq(CONFIG_EXT_NAME), eq(copyOf(DEFAULT_CONFIGS)));
     }
@@ -200,7 +205,7 @@ public class BuildConfigPluginTest {
         buildConfigPlugin.apply(project);
 
         List<String> loadedConfigs = captureLoadedConfigs();
-        HasLoad      hasLoad       = captureHasLoad();
+        HasLoad hasLoad = captureHasLoad();
 
         assertThat(loadedConfigs, is(copyOf(DEFAULT_CONFIGS)));
 
@@ -226,5 +231,18 @@ public class BuildConfigPluginTest {
         ArgumentCaptor<Map<String, ?>> mapCaptor = ArgumentCaptor.forClass(Map.class);
         verify(project, atLeastOnce()).apply(mapCaptor.capture());
         return mapCaptor.getAllValues();
+    }
+
+
+    private Logger createSystemLogger() {
+        OutputEventListenerBackedLoggerContext outputEventListenerBackedLoggerContext = new OutputEventListenerBackedLoggerContext(System.out, System.err, new TrueTimeProvider());
+        outputEventListenerBackedLoggerContext.setLevel(LogLevel.DEBUG);
+
+        OutputEventRenderer renderer = new OutputEventRenderer(Actions.doNothing());
+        renderer.addStandardOutputListener(System.out);
+        renderer.addStandardErrorListener( System.err);
+        renderer.configure(LogLevel.DEBUG);
+        outputEventListenerBackedLoggerContext.setOutputEventListener(renderer);
+        return new OutputEventListenerBackedLogger(BuildConfigPluginTest.class.getSimpleName(), outputEventListenerBackedLoggerContext, new TrueTimeProvider());
     }
 }

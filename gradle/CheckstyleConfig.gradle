@@ -1,12 +1,20 @@
 apply plugin: 'checkstyle'
 
-def getCheckStyleConfigFile() {
-    def url = project.buildscript.classLoader.getResource('checkstyle/checkstyle.xml').toURI();
-    return new File(url)
+def setCheckStyleConfigFile(resourceName) {
+    def url = project.buildscript.classLoader.getResource(resourceName);
+    if (url != null) {
+        okjava.log('CheckstyleConfig: loading checkstyle configuration from ' + url.toString())
+        checkstyle {
+            config = project.resources.text.fromString url.openStream().text
+        }
+    } else {
+        okjava.log('CheckstyleConfig: fail to load checkstyle configuration from resource ' + resourceName)
+    }
 }
 
 checkstyle {
     toolVersion = "6.19"
     ignoreFailures = false
-    configFile = getCheckStyleConfigFile()
 }
+
+setCheckStyleConfigFile('checkstyle/checkstyle.xml')

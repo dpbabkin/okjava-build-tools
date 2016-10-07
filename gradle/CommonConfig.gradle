@@ -1,6 +1,4 @@
-//println project.ext.BuildConfigPluginGretting
-
-okjava('JavaConfig')
-
-
+def configs = ['JavaConfig', 'CheckstyleConfig', 'FindbugConfig']
+okjava.log('CommonConfig includes: ' + configs.join(', '))
+configs.each { config -> okjava(config) }
 

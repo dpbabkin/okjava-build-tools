@@ -5,7 +5,7 @@ apply plugin: 'java-gradle-plugin'
 
 defaultTasks 'build'
 
-//apply plugin: 'maven'
+apply plugin: 'maven'
 
 repositories {
     jcenter()
@@ -22,17 +22,17 @@ dependencies {
 jar {
     from('.') {
         include 'gradle/'
-        include 'config/'
+        include 'checkstyle/'
     }
 }
 
-//group = 'okjava'
-//version = '1.0'
-//
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri('../repo'))
-//        }
-//    }
-//}
+group = 'okjava'
+version = '1.0'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+        }
+    }
+}

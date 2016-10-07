@@ -6,6 +6,6 @@ buildscript {
 
 
     dependencies {
-        classpath 'com.github.dpbabkin:okjava-build-tools:-SNAPSHOT'
+        classpath 'com.github.dpbabkin:okjava-build-tools:master-SNAPSHOT'
     }
 }
