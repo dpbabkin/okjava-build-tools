@@ -1,11 +1,4 @@
-println 'rootProject.name: ' + rootProject.name
-println 'project.name: ' + project.name
-apply plugin: 'java'
 apply plugin: 'java-gradle-plugin'
-
-defaultTasks 'build'
-
-apply plugin: 'maven'
 
 repositories {
     jcenter()
@@ -16,23 +9,11 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '+'
     testCompile group: 'com.google.guava', name: 'guava', version: '+'
     testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '+'
-    //testRuntime files(sourceSets.test.output.classesDir)
 }
 
 jar {
     from('.') {
         include 'gradle/'
         include 'checkstyle/'
-    }
-}
-
-group = 'okjava'
-version = '1.0'
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri('../repo'))
-        }
     }
 }
