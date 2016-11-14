@@ -103,7 +103,7 @@ public class BuildConfigPlugin implements Plugin<Project> {
             if (object instanceof Collection<?>) {
                 return ((Collection<?>) object).stream().map(Object::toString).collect(toList());
             } else {
-                throw new IllegalStateException(THIS_LOG_PREFIX + "object in ext." + OKJAVA_EXT_NAME + " has wrong type:=" + object.getClass() + " object:=" + object);
+                throw new IllegalStateException(THIS_LOG_PREFIX + "object write ext." + OKJAVA_EXT_NAME + " has wrong type:=" + object.getClass() + " object:=" + object);
             }
         }
         return asList(DEFAULT_CONFIGS);
