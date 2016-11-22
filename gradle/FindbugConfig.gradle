@@ -6,3 +6,9 @@ tasks.withType(FindBugs) {
         html.enabled true
     }
 }
+
+findbugs {
+    effort = "max"
+    reportLevel = "high"
+    ignoreFailures = false
+}

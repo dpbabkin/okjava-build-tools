@@ -13,7 +13,6 @@ def setCheckStyleConfigFile(resourceName) {
 }
 
 checkstyle {
-    toolVersion = "6.19"
     ignoreFailures = false
 }
 
