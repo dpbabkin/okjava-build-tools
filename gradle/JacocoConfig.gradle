@@ -1,0 +1,9 @@
+apply plugin: 'jacoco'
+
+jacocoTestReport {
+    reports {
+        html.enabled = true
+    }
+}
+jacocoTestReport.dependsOn test
+build.dependsOn jacocoTestReport
